@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Валентинка с Кадзу</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .card-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px; 
+            height: 100vh;
+            background-image: url("фон.jpg"); 
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Анимация "выныривания" персонажа */
+        #character {
+            position: absolute;
+            right: -120px; 
+            bottom: 0;
+            height: 90%; 
+            z-index: 1;
+            opacity: 0;
+            transition: all 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        #character.active {
+            right: 0;
+            opacity: 1;
+        }
+
+        /* Облачко для текста */
+        .speech-bubble-text {
+            position: absolute;
+            top: 55%; 
+            width: 80%; 
+            padding: 20px; 
+            text-align: center;
+            font-size: 20px;
+            color: #ffffff; 
+            font-weight: bold;
+            line-height: 1.4;
+            z-index: 3;
+            background: rgba(0, 0, 0, 0.45); 
+            border-radius: 20px; 
+            backdrop-filter: blur(6px); 
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .controls {
+            position: absolute;
+            top: 78%; 
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        button {
+            padding: 12px 35px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            transition: all 0.2s;
+            color: white;
+            font-weight: bold;
+        }
+
+        #yes-btn { background: #b01c33; }
+        #no-btn { background: #4a4a4a; }
+        button:hover { transform: scale(1.1); }
+
+        /* Эффект сердечек */
+        .heart {
+            position: absolute;
+            color: #ff4d6d;
+            animation: fly 3s linear forwards;
+            z-index: 100;
+            pointer-events: none;
+        }
+        @keyframes fly {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card-container">
+        <img id="character" src="" alt="Кадзу">
+        
+        <div class="speech-bubble-text" id="dialog-text">
+            Пушистая, будешь моей валентинкой?
+        </div>
+
+        <div class="controls" id="btn-group">
+            <button id="yes-btn">ДА</button>
+            <button id="no-btn">Нет</button>
+        </div>
+    </div>
+
+    <script>
+        const charImg = document.getElementById('character');
+        const textElement = document.getElementById('dialog-text');
+        const noBtn = document.getElementById('no-btn');
+        const yesBtn = document.getElementById('yes-btn');
+        const btnGroup = document.getElementById('btn-group');
+
+        const stages = {
+            start: { img: "кадзу-вау-сама.png", text: "Пушистая, будешь моей валентинкой?" },
+            no1: { img: "кадзу вафиге.png", text: "..." },
+            no2: { img: "кадзу сииикс севен.png", text: "Соглашайся, упрямая." },
+            final: { img: "голи кадзу финал.png", text: "(─‿‿─)♡" }
+        };
+
+        let currentNoStep = 0;
+
+        // Начальное появление
+        window.onload = () => {
+            charImg.src = stages.start.img;
+            setTimeout(() => charImg.classList.add('active'), 200);
+        };
+
+        noBtn.addEventListener('click', () => {
+            currentNoStep++;
+            if (currentNoStep === 1) {
+                updateStage(stages.no1);
+            } else if (currentNoStep >= 2) {
+                updateStage(stages.no2);
+                noBtn.style.display = 'none'; 
+            }
+        });
+
+        yesBtn.addEventListener('click', () => {
+            updateStage(stages.final);
+            btnGroup.style.display = 'none'; 
+            // Запускаем сердечки
+            setInterval(spawnHeart, 150);
+        });
+
+        function updateStage(stage) {
+            charImg.classList.remove('active');
+            
+            setTimeout(() => {
+                charImg.src = stage.img;
+                textElement.innerText = stage.text;
+                charImg.classList.add('active');
+            }, 400);
+        }
+
+        function spawnHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.top = '100vh';
+            heart.style.fontSize = (Math.random() * 20 + 20) + 'px';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
